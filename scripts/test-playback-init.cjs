@@ -47,6 +47,7 @@ function fixture(profiles = {}) {
     '@common/mainIpc': { mainHandle: (channel, handler) => handlers.set(channel, handler) },
     '@main/modules/winMain/main': {},
     './matching': { aggregateFavorites: () => [] },
+    './bilibiliLocalLibrary': { createBilibiliLocalLibrary: () => ({ init: async() => {}, tracks: (_owner, tracks) => tracks, visible: () => true, detail: value => value }) },
     './navigation': { registerAccountSession() {} },
     './playback': {
       createPlaybackResolver: readStates => {

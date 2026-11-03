@@ -6,7 +6,7 @@
       <PlaylistHeader :title="currentName" :compact="headerCompact">
         <template #cover><TrackArtwork v-if="coverTrack" :track="coverTrack" :list-id="listId" :alt="`${currentName} 封面`" /><img v-else-if="currentPlatformList?.cover" :src="currentPlatformList.cover" :alt="`${currentName} 封面`" referrerpolicy="no-referrer"><UiIcon v-else :name="listId === 'love' ? 'heart' : listId === LOCAL_LIBRARY_ID ? 'folder' : 'music'" /></template>
         <template #details><p>{{ tracks.length }} 首歌曲 · {{ currentPlatformList ? `${platformName(currentPlatformList.platform)} · 平台创建歌单` : `${localCount} 首本地音乐` }}</p></template>
-        <template #extra><div v-if="currentUserList" class="ui-library-edit"><button type="button" aria-label="重命名当前歌单" @click="openPlaylist('rename')">编辑</button><button type="button" aria-label="删除当前歌单" @click="openPlaylist('delete')">删除</button></div></template>
+        <template #extra><div v-if="currentUserList" class="ui-library-edit"><button type="button" aria-label="重命名当前歌单" @click="openPlaylist('rename')">编辑</button><button type="button" aria-label="删除当前歌单" @click="openPlaylist('delete')">删除</button></div><div v-else-if="currentPlatformList?.platform === 'bilibili'" class="ui-library-edit"><button type="button" @click="bilibiliRemoveTarget = currentPlatformList">从 LinkLine 移除</button></div></template>
         <template #actions>
           <button type="button" class="ui-playlist-header__primary" :disabled="!tracks.length" @click="playFirst"><UiIcon name="play" filled />播放全部</button>
           <button v-if="currentPlatformList" type="button" :disabled="loading" @click="refreshPlatformPlaylist"><UiIcon name="refresh" />同步歌单</button>
@@ -22,9 +22,9 @@
 
       <div v-if="importProgress && importing" class="ui-library-import-progress" role="status" aria-live="polite"><div><strong>正在扫描并导入本地音乐</strong><p>发现 {{ importProgress.discovered }} 首 · 已导入 {{ importProgress.imported }} 首 · 跳过 {{ importProgress.skipped }} 项 · 失败 {{ importProgress.failed + importProgress.metadataFailed }} 项</p><small :title="importProgress.directory">{{ importProgress.directory || '正在读取所选文件…' }}</small></div><button type="button" :disabled="importCancelled" @click="importCancelled = true">{{ importCancelled ? '正在停止…' : '停止导入' }}</button></div>
       <div v-if="actionError" class="ui-library-error" role="alert">{{ actionError }}<button type="button" aria-label="关闭错误提示" @click="actionError = ''"><UiIcon name="close" /></button></div>
-      <div v-if="selected.size" class="ui-library-selection"><span>已选择 {{ selected.size }} 首</span><button type="button" @click="openTrackAction('add', selectedTracks)">加入歌单</button><button type="button" @click="favoriteMany(selectedTracks)">收藏</button><button type="button" @click="openTrackAction('download', selectedTracks)">下载</button><button v-if="!currentPlatformList" type="button" @click="requestRemove(selectedTracks)">移除</button><button type="button" @click="selected = new Set()">取消选择</button></div>
+      <div v-if="selected.size" class="ui-library-selection"><span>已选择 {{ selected.size }} 首</span><button type="button" @click="openTrackAction('add', selectedTracks)">加入歌单</button><button type="button" @click="favoriteMany(selectedTracks)">收藏</button><button type="button" @click="openTrackAction('download', selectedTracks)">下载</button><button v-if="canRemoveTracks" type="button" @click="requestRemove(selectedTracks)">移除</button><button type="button" @click="selected = new Set()">取消选择</button></div>
       <div class="ui-library-results">
-        <TrackTable ref="trackTable" virtualized :list="filteredTracks" :list-id="listId" :loading="loading" :error="error" :removable="!currentPlatformList" :selected-ids="selected" :empty-title="query ? '没有找到匹配的歌曲' : currentPlatformList ? '平台歌单暂时没有歌曲' : listId === LOCAL_LIBRARY_ID ? '导入文件或文件夹，开始聆听本地音乐' : '给这个歌单加入第一首音乐'" @play="playTrack" @add="addTrack" @download="downloadTrack" @remove="removeTrack" @retry="loadTracks">
+        <TrackTable ref="trackTable" virtualized :list="filteredTracks" :list-id="listId" :loading="loading" :error="error" :removable="canRemoveTracks" :selected-ids="selected" :empty-title="query ? '没有找到匹配的歌曲' : currentPlatformList ? '平台歌单暂时没有歌曲' : listId === LOCAL_LIBRARY_ID ? '导入文件或文件夹，开始聆听本地音乐' : '给这个歌单加入第一首音乐'" @play="playTrack" @add="addTrack" @download="downloadTrack" @remove="removeTrack" @retry="loadTracks">
           <template #actions="{ track }: { track: LX.Music.MusicInfo }"><button type="button" class="ui-library-row-btn" :class="{ loved: isFavorite(track) }" :aria-pressed="isFavorite(track)" :aria-label="isFavorite(track) ? '取消收藏' : '收藏歌曲'" :disabled="favoritePending.has(track.id)" @click="toggleFavorite(track)"><UiIcon name="heart" :filled="isFavorite(track)" /></button><button v-if="!currentPlatformList" type="button" class="ui-library-row-btn" aria-label="编辑歌曲信息" @click="editTrack(track)"><UiIcon name="more" /></button></template>
           <template #selection="{ track }: { track: LX.Music.MusicInfo }"><input type="checkbox" :checked="selected.has(track.id)" :aria-label="`选择 ${track.name}`" @change="toggleSelected(track.id)"></template>
         </TrackTable>
@@ -34,10 +34,11 @@
     </main>
 
     <PlaylistDialog :show="playlistOpen" :action="playlistAction" :list-info="currentUserList" @close="playlistOpen = false" @saved="playlistSaved" />
+    <BilibiliPlaylistRemoveDialog :playlist="bilibiliRemoveTarget" @close="bilibiliRemoveTarget = null" />
     <TrackMetadataModal :show="metadataOpen" :track="metadataTrack" :list-id="listId" @close="metadataOpen = false" @saved="metadataSaved" />
     <TrackActionModal :show="trackActionOpen" :action="trackAction" :tracks="actionTracks" :from-list-id="listId" @close="trackActionOpen = false" @success="handleSuccess" />
     <UiModal :show="importAudioOpen" title="导入本地音乐" subtitle="添加到「本地音乐」，随时可加入其他歌单" @close="importAudioOpen = false"><div class="ui-local-import-options"><button type="button" @click="importAudio('files')"><UiIcon name="music" /><span><strong>选择音乐文件</strong><small>支持同时选择多个音频文件</small></span><UiIcon name="chevronRight" /></button><button type="button" @click="importAudio('folder')"><UiIcon name="folder" /><span><strong>选择文件夹</strong><small>自动递归扫描子文件夹中的音频</small></span><UiIcon name="chevronRight" /></button></div><p class="ui-dialog-note">导入数量不限。自动跳过已导入文件、非音频文件和符号链接；读取失败不会中断其余音乐。导入保留原文件位置，不会复制或删除文件。</p></UiModal>
-    <UiModal :show="removeOpen" title="从歌单移除歌曲" :subtitle="`已选择 ${removeTracks.length} 首歌曲`" @close="removeOpen = false"><p class="ui-dialog-note">歌曲将从当前歌单移除，本地文件会继续保留。</p><template #footer><button type="button" class="ui-dialog-button" @click="removeOpen = false">取消</button><button type="button" class="ui-dialog-button ui-dialog-button-danger" :disabled="removing" @click="confirmRemove">{{ removing ? '移除中…' : '移除歌曲' }}</button></template></UiModal>
+    <UiModal :show="removeOpen" title="从歌单移除歌曲" :subtitle="`已选择 ${removeTracks.length} 首歌曲`" @close="removeOpen = false"><p class="ui-dialog-note">{{ removesBilibiliLocally ? '所选 B 站视频仅从 LinkLine 音乐库移除，不会取消 B 站收藏；重新同步也不会自动加入。' : '歌曲将从当前歌单移除，本地文件会继续保留。' }}</p><template #footer><button type="button" class="ui-dialog-button" :disabled="removing" @click="removeOpen = false">取消</button><button type="button" class="ui-dialog-button ui-dialog-button-danger" :disabled="removing" @click="confirmRemove">{{ removing ? '移除中…' : '移除歌曲' }}</button></template></UiModal>
   </section>
 </template>
 
@@ -54,6 +55,8 @@ import { playlistCoverTrack, rememberPlaylistCover } from '../usePlaylistCover'
 import UiSelect from '../components/UiSelect.vue'
 import TrackActionModal from '../components/TrackActionModal.vue'
 import PlaylistDialog from '../components/PlaylistDialog.vue'
+import BilibiliPlaylistRemoveDialog from '../components/BilibiliPlaylistRemoveDialog.vue'
+import type { PlatformPlaylist } from '@common/platformAccounts'
 import TrackMetadataModal from '../components/TrackMetadataModal.vue'
 import { usePaginationScroll } from '../usePaginationScroll'
 import { useCollapsingPlaylistHeader } from '../useCollapsingPlaylistHeader'
@@ -66,7 +69,7 @@ import { playList } from '@renderer/core/player'
 import { openSaveDir, showSelectDialog } from '@renderer/utils/ipc'
 import { getListPrevSelectId, saveListPrevSelectId } from '@renderer/utils/data'
 import { filterMusicList, fixNewMusicInfoQuality, toNewMusicInfo, filterFileName } from '@renderer/utils'
-import { favoritePending, isFavorite, refreshFavorites, setFavorite, setFavorites, platformPlaylists, loadPlatformPlaylist, platformName, initializePlatformAccounts } from '../services/platformAccounts'
+import { favoritePending, isFavorite, refreshFavorites, setFavorite, setFavorites, platformPlaylists, platformSnapshot, loadPlatformPlaylist, platformName, initializePlatformAccounts, removeBilibiliLocal } from '../services/platformAccounts'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,12 +101,15 @@ const actionTracks = ref<LX.Music.MusicInfo[]>([])
 const removeOpen = ref(false)
 const removeTracks = ref<LX.Music.MusicInfo[]>([])
 const removing = ref(false)
+const bilibiliRemoveTarget = ref<PlatformPlaylist | null>(null)
 const playlists = computed(() => [
   { ...loveList, name: '我的收藏', platform: null, cover: '' },
   ...platformPlaylists.value,
   ...userLists.filter(item => item.id !== LOCAL_LIBRARY_ID).map(item => ({ ...item, platform: null, cover: '' })),
 ])
 const currentPlatformList = computed(() => platformPlaylists.value.find(item => item.id === listId.value) ?? null)
+const canRemoveTracks = computed(() => !currentPlatformList.value || currentPlatformList.value.platform === 'bilibili')
+const removesBilibiliLocally = computed(() => (currentPlatformList.value?.platform === 'bilibili' || listId.value === loveList.id) && removeTracks.value.some(track => track.source === 'bi'))
 const currentName = computed(() => playlists.value.find(item => item.id === listId.value)?.name ?? '我的音乐')
 const currentUserList = computed(() => listId.value === LOCAL_LIBRARY_ID ? null : userLists.find(item => item.id === listId.value) ?? null)
 const coverTrack = computed(() => playlistCoverTrack(listId.value, tracks.value))
@@ -144,7 +150,7 @@ watch(() => route.query.id, id => {
   if (id === LOCAL_LIBRARY_ID) { void router.replace('/local'); return }
   if (typeof id === 'string' && id !== listId.value) listId.value = playlists.value.some(item => item.id === id) ? id : loveList.id
 })
-watch(listId, () => { query.value = ''; sort.value = 'original'; originalOrder.value = []; selected.value = new Set(); saveListPrevSelectId(listId.value); void loadTracks() })
+watch(listId, () => { query.value = ''; sort.value = 'original'; originalOrder.value = []; selected.value = new Set(); removeOpen.value = false; saveListPrevSelectId(listId.value); void loadTracks() })
 watch(() => playlists.value.map(item => item.id), () => {
   if (initialized.value && !playlists.value.some(item => item.id === listId.value)) void chooseList(loveList.id)
 })
@@ -202,8 +208,25 @@ async function toggleFavorite(track: LX.Music.MusicInfo) {
 function requestRemove(list: LX.Music.MusicInfo[]) { removeTracks.value = [...list]; removeOpen.value = true }
 function removeTrack(track: LX.Music.MusicInfo) { requestRemove([track]) }
 async function confirmRemove() {
+  if (removing.value || !canRemoveTracks.value) return
+  const id = listId.value
+  const list = [...removeTracks.value]
+  const localBilibili = removesBilibiliLocally.value
+  const ownerId = currentPlatformList.value?.ownerId ?? platformSnapshot.value.accounts.find(account => account.platform === 'bilibili')?.profile?.id
   removing.value = true
-  await perform(async() => { if (listId.value === loveList.id) await setFavorites(removeTracks.value, false); else await removeListMusics({ listId: listId.value, ids: removeTracks.value.map(track => track.id) }); await loadTracks(); removeOpen.value = false; selected.value = new Set() })
+  await perform(async() => {
+    const bilibili = localBilibili ? list.filter(track => track.source === 'bi') : []
+    if (bilibili.length) {
+      if (!ownerId) throw new Error('未找到哔哩哔哩账号记录，请重新打开音乐库')
+      await removeBilibiliLocal({ ownerId, trackIds: bilibili.map(track => track.id) })
+    }
+    if (id === loveList.id) {
+      if (bilibili.length) await removeListMusics({ listId: id, ids: bilibili.map(track => track.id) })
+      const other = list.filter(track => !bilibili.includes(track))
+      if (other.length) await setFavorites(other, false)
+    } else if (!localBilibili) await removeListMusics({ listId: id, ids: list.map(track => track.id) })
+    if (id === listId.value) { await loadTracks(); removeOpen.value = false; selected.value = new Set() }
+  })
   removing.value = false
 }
 async function changeSort(input: string | number) {
