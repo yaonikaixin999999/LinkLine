@@ -34,6 +34,7 @@ const index = load('src/main/modules/platformAccounts/index.ts', {
   '@common/mainIpc': { mainHandle: (name, handler) => handlers.set(name, handler) },
   '@main/modules/winMain/main': {},
   './matching': load('src/common/platformMatching.ts'),
+  './bilibiliLocalLibrary': { createBilibiliLocalLibrary: () => ({ init: async() => {}, tracks: (_owner, tracks) => tracks, visible: () => true, detail: value => value }) },
   './providers/qq': { qqProvider: provider('qq', 'tx') },
   './providers/netease': { neteaseProvider: provider('netease', 'wy') },
   './providers/kugou': { kugouProvider: provider('kugou', 'kg') },

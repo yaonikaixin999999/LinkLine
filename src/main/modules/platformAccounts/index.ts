@@ -23,6 +23,7 @@ import { canNavigateAccount, registerAccountSession } from './navigation'
 import { createPlaybackResolver } from './playback'
 import type { PlatformQuality, ResolvedPlatformStream } from '@common/platformPlayback'
 import { getImportedPlaybackSources } from '../userApi/playback'
+import { createBilibiliLocalLibrary, type BilibiliLocalRemoval } from './bilibiliLocalLibrary'
 
 interface ProviderState {
   provider: PlatformProvider
@@ -42,13 +43,15 @@ const accountChecks = new Map<PlatformId, { generation: number, promise: Promise
 const playbackAccountChecks = new Map<PlatformId, { generation: number, promise: Promise<void> }>()
 let saveQueue = Promise.resolve()
 const cachePath = () => path.join(app.getPath('userData'), 'platform-favorites.json')
+const bilibiliLocal = createBilibiliLocalLibrary(() => path.join(app.getPath('userData'), 'bilibili-local-library.json'))
+const visibleTracks = (state: ProviderState) => state.provider.id === 'bilibili' ? bilibiliLocal.tracks(state.account.profile?.id ?? '', state.tracks) : state.tracks
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : '平台请求失败，请重试'
 const hasAuthentication = (provider: PlatformProvider, cookies: Record<string, string>) => provider.authenticated?.(cookies) ?? Boolean(provider.id === 'qq' ? cookies.qqmusic_key || cookies.qm_keyst : provider.id === 'netease' ? cookies.MUSIC_U : Object.keys(cookies).length)
 const playback = createPlaybackResolver(() => [...states.values()], () => global.lx.appSetting['player.preferredSource'], getImportedPlaybackSources)
 const snapshot = (): PlatformSnapshot => ({
-  accounts: [...states.values()].map(state => ({ ...state.account })),
-  favorites: aggregateFavorites([...states.values()].map(state => ({ platform: state.provider.id, tracks: state.tracks }))),
-  playlists: [...states.values()].flatMap(state => state.playlists.map(item => ({ ...item.playlist }))),
+  accounts: [...states.values()].map(state => ({ ...state.account, count: visibleTracks(state).length })),
+  favorites: aggregateFavorites([...states.values()].map(state => ({ platform: state.provider.id, tracks: visibleTracks(state) }))),
+  playlists: [...states.values()].flatMap(state => state.playlists.filter(item => bilibiliLocal.visible(item.playlist)).map(item => ({ ...item.playlist, count: item.playlist.platform === 'bilibili' && item.playlist.loaded ? bilibiliLocal.tracks(item.playlist.ownerId, item.tracks).length : item.playlist.count }))),
 })
 const notify = () => sendEvent('platform_accounts_changed', snapshot())
 const save = async() => {
@@ -62,6 +65,7 @@ const save = async() => {
 }
 const initBase = async() => {
   baseInitialized ??= (async() => {
+    await bilibiliLocal.init()
     for (const provider of providers) {
       const ses = session.fromPartition(`persist:linkline-account-${provider.id}`)
       registerAccountSession(ses, provider.domains)
@@ -228,9 +232,10 @@ const getPlaylist = async(params: { id: string, refresh?: boolean }): Promise<Pl
       }
       const entry = state.playlists.find(item => item.playlist.id === params.id && item.playlist.ownerId === state.account.profile?.id)
       if (!entry) throw new Error('歌单不属于当前账号，请重新同步')
-      if (!params.refresh && entry.playlist.loaded) return { ...entry, cached: true }
+      if (!bilibiliLocal.visible(entry.playlist)) throw new Error('此歌单已从 LinkLine 移除')
+      if (!params.refresh && entry.playlist.loaded) return bilibiliLocal.detail({ ...entry, cached: true })
       if (!state.account.connected) {
-        if (entry.playlist.lastSync != null && !params.refresh) return { ...entry, cached: true }
+        if (entry.playlist.lastSync != null && !params.refresh) return bilibiliLocal.detail({ ...entry, cached: true })
         throw new Error('请重新登录平台后加载此歌单')
       }
       if (!state.provider.playlistTracks) throw new Error('此平台暂不支持读取歌单')
@@ -242,12 +247,32 @@ const getPlaylist = async(params: { id: string, refresh?: boolean }): Promise<Pl
       entry.playlist = { ...entry.playlist, count: tracks.length, loaded: true, lastSync: Date.now() }
       await save()
       notify()
-      return { ...entry, cached: false }
+      return bilibiliLocal.detail({ ...entry, cached: false })
     } catch (error) {
       await save()
       notify()
       throw error
     }
+  })
+}
+
+const removeBilibiliLocal = async(params: BilibiliLocalRemoval): Promise<PlatformSnapshot> => {
+  // Do not call init()/getState(): local removal must also work with expired
+  // login and must not check profiles or write to the remote favorites API.
+  await initBase()
+  const state = states.get('bilibili')!
+  const generation = state.generation
+  return exclusive(state, async() => {
+    if (!params || !state.account.profile || params.ownerId !== state.account.profile.id || state.generation !== generation) throw new Error('哔哩哔哩账号已更改，请重新打开歌单')
+    if (params.playlistId) {
+      if (!state.playlists.some(item => item.playlist.id === params.playlistId && item.playlist.ownerId === params.ownerId)) throw new Error('歌单不属于当前哔哩哔哩账号')
+    } else {
+      const known = new Set([...state.tracks, ...state.playlists.flatMap(item => item.tracks)].map(track => track.id))
+      if (!Array.isArray(params.trackIds) || params.trackIds.some(id => !known.has(id))) throw new Error('视频不属于当前哔哩哔哩音乐库，请重新同步')
+    }
+    await bilibiliLocal.remove(params)
+    notify()
+    return snapshot()
   })
 }
 
@@ -586,6 +611,7 @@ export default () => {
     return snapshot()
   })
   mainHandle<{ id: string, refresh?: boolean }, PlatformPlaylistDetail>('platform_accounts_playlist', async({ params }) => getPlaylist(params))
+  mainHandle<BilibiliLocalRemoval, PlatformSnapshot>('platform_bilibili_remove_local', async({ params }) => removeBilibiliLocal(params))
   mainHandle<PlatformHeartbeatRequest, PlatformHeartbeatResult>('platform_netease_heartbeat', async({ params }) => getHeartbeat(params))
   mainHandle<PlatformId, PlatformSnapshot>('platform_accounts_logout', async({ params }) => {
     const state = await getState(params)

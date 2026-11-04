@@ -41,13 +41,15 @@
       <button type="button" role="menuitemradio" :aria-checked="playlistTab === 'collected'" @click="selectPlaylistGroup('collected')"><UiIcon name="heart" /><span>收藏歌单</span><UiIcon v-if="playlistTab === 'collected'" name="check" /></button>
       <button type="button" role="menuitem" class="ui-playlist-group-create" @click="selectPlaylistGroup('create')"><UiIcon name="plus" /><span>新建歌单</span></button>
     </div></Teleport>
-    <PlaylistContextMenu :show="Boolean(menuTarget)" :x="menuPoint.x" :y="menuPoint.y" :editable="menuEditable" :can-play="menuCanPlay" :trigger="menuTrigger" @close="closePlaylistMenu" @select="playlistMenuAction" />
+    <PlaylistContextMenu :show="Boolean(menuTarget)" :x="menuPoint.x" :y="menuPoint.y" :editable="menuEditable" :removable="menuTarget?.platform === 'bilibili'" :can-play="menuCanPlay" :trigger="menuTrigger" @close="closePlaylistMenu" @select="playlistMenuAction" />
+    <BilibiliPlaylistRemoveDialog :playlist="bilibiliRemoveTarget" @close="bilibiliRemoveTarget = null" @removed="bilibiliRemoved" />
     <PlaylistDialog v-if="contextDialogOpen" :show="contextDialogOpen" :action="contextAction" :list-info="contextList" @close="contextDialogOpen = false" @saved="contextSaved" />
     <UiModal :show="Boolean(menuError)" title="歌单操作未完成" @close="menuError = ''"><p>{{ menuError }}</p></UiModal>
     <PlaylistDialog v-if="playlistOpen" :show="playlistOpen" action="create" :list-info="null" @close="playlistOpen = false" @saved="openCreatedPlaylist" />
   </div>
 </template>
 <script setup>
+import BilibiliPlaylistRemoveDialog from './components/BilibiliPlaylistRemoveDialog.vue'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { isShowAnimation } from '@renderer/store/setting'
@@ -132,6 +134,8 @@ const contextDialogOpen = ref(false)
 const contextAction = ref('rename')
 const contextList = shallowRef(null)
 const menuEditable = computed(() => Boolean(menuTarget.value && userLists.some(list => list.id === menuTarget.value.id)))
+const bilibiliRemoveTarget = shallowRef(null)
+function bilibiliRemoved(id) { if (route.path === '/list' && route.query.id === id) void router.replace({ path: '/list', query: { id: 'love' } }) }
 let menuVersion = 0
 function closePlaylistMenu() { menuVersion++; menuTarget.value = null }
 async function playlistTracks(list) {
@@ -145,7 +149,7 @@ async function openPlaylistMenu(event, list) {
   const bounds = event.currentTarget.getBoundingClientRect()
   menuPoint.value = event.type === 'keydown' ? { x: bounds.right, y: bounds.top } : { x: event.clientX, y: event.clientY }
   menuCanPlay.value = false
-  try { const tracks = await playlistTracks(list); if (request === menuVersion) menuCanPlay.value = Boolean(tracks.length) } catch (error) { if (request === menuVersion) { closePlaylistMenu(); menuError.value = error instanceof Error ? error.message : '暂时无法读取歌单，请重试。' } }
+  try { const tracks = await playlistTracks(list); if (request === menuVersion) menuCanPlay.value = Boolean(tracks.length) } catch (error) { if (request === menuVersion && list.platform !== 'bilibili') { closePlaylistMenu(); menuError.value = error instanceof Error ? error.message : '暂时无法读取歌单，请重试。' } }
 }
 function playlistKey(event, list) {
   if (event.key !== 'ContextMenu' && !(event.shiftKey && event.key === 'F10')) return
@@ -156,6 +160,7 @@ async function playlistMenuAction(action) {
   const editable = menuEditable.value
   closePlaylistMenu()
   if (!list) return
+  if (action === 'delete' && list.platform === 'bilibili') { bilibiliRemoveTarget.value = list; return }
   if (action !== 'play') {
     if (!editable) return
     contextAction.value = action; contextList.value = userLists.find(item => item.id === list.id); contextDialogOpen.value = true

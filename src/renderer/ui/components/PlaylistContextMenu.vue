@@ -1,14 +1,14 @@
 <template>
   <Teleport to="body"><div v-if="show" ref="panel" class="ui-playlist-context-menu" :style="position" role="menu" aria-label="歌单操作" @keydown="onKey" @contextmenu.prevent>
     <button type="button" role="menuitem" :disabled="!canPlay" @click="select('play')"><UiIcon name="play" /><span>播放</span></button>
-    <button type="button" role="menuitem" :disabled="!editable" @click="select('delete')"><UiIcon name="trash" /><span>删除</span></button>
+    <button type="button" role="menuitem" :disabled="!(editable || removable)" @click="select('delete')"><UiIcon name="trash" /><span>{{ removable && !editable ? '从 LinkLine 移除' : '删除' }}</span></button>
     <button type="button" role="menuitem" :disabled="!editable" @click="select('rename')"><span class="ui-playlist-context-spacer" aria-hidden="true" /><span>重命名</span></button>
   </div></Teleport>
 </template>
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import UiIcon from './UiIcon.vue'
-interface MenuProps { show: boolean, x: number, y: number, editable: boolean, canPlay: boolean, trigger: HTMLElement | null }
+interface MenuProps { show: boolean, x: number, y: number, editable: boolean, removable?: boolean, canPlay: boolean, trigger: HTMLElement | null }
 const props: MenuProps = defineProps<MenuProps>()
 const emit = defineEmits<{ close: [], select: [action: 'play' | 'rename' | 'delete'] }>()
 const panel = ref<HTMLElement | null>(null)

@@ -28,6 +28,10 @@ export const platformPlaylists = computed(() => platformSnapshot.value.playlists
 export async function loadPlatformPlaylist(id: string, refresh = false): Promise<PlatformPlaylistDetail> {
   return ipcRenderer.invoke('platform_accounts_playlist', { id, refresh })
 }
+export async function removeBilibiliLocal(params: { ownerId: string, playlistId?: string, trackIds?: string[] }): Promise<void> {
+  acceptSnapshot(await ipcRenderer.invoke('platform_bilibili_remove_local', params))
+  await queue
+}
 
 let initialized: Promise<void> | null = null
 let stopped = false
