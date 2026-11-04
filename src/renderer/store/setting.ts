@@ -20,7 +20,7 @@ export const initSetting = (newSetting: LX.AppSetting) => {
 }
 
 export const mergeSetting = (newSetting: Partial<LX.AppSetting>) => {
-  for (const [key, value] of Object.entries(removeRetiredDefaultSourceSettings(newSetting))) {
+  for (const [key, value] of Object.entries(removeRetiredDefaultSourceSettings(newSetting) ?? {})) {
     if (key === 'player.playQuality' && !isPlatformQuality(value)) continue
     if (key === 'player.preferredSource' && !isPreferredPlatformSource(value)) continue
     // @ts-expect-error
