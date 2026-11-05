@@ -40,18 +40,44 @@ LinkLine 是一款基于 LXMusic 开源项目再开发的桌面音乐应用。�
       <br><strong>深色主题</strong><br><sub>在浅色与深色之间自由切换</sub>
     </td>
     <td width="50%" align="center">
-      <a href="docs/images/readme/playlists.webp"><img src="docs/images/readme/playlists.webp" alt="LinkLine 精选歌单页面" width="500"></a>
-      <br><strong>精选歌单</strong><br><sub>按平台与分类，发现下一首喜欢的歌</sub>
+      <a href="docs/images/readme/appearance.webp"><img src="docs/images/readme/appearance.webp" alt="LinkLine 自定义图片主题排行榜页面" width="500"></a>
+      <br><strong>自定义主题</strong><br><sub>用喜欢的图片与配色，打造自己的音乐空间</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
+      <a href="docs/images/readme/playlists.webp"><img src="docs/images/readme/playlists.webp" alt="LinkLine 精选歌单页面" width="500"></a>
+      <br><strong>精选歌单</strong><br><sub>按平台与分类，发现下一首喜欢的歌</sub>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/readme/favorites.webp"><img src="docs/images/readme/favorites.webp" alt="LinkLine 我的喜欢歌曲列表" width="500"></a>
+      <br><strong>我的喜欢</strong><br><sub>把不同平台喜欢的歌曲，放进同一个音乐库</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <a href="docs/images/readme/now-playing.webp"><img src="docs/images/readme/now-playing.webp" alt="LinkLine 当前播放界面，专辑封面与滚动歌词" width="500"></a>
+      <br><strong>当前播放</strong><br><sub>沉浸封面与滚动歌词，专注当前这首歌</sub>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/readme/comments.webp"><img src="docs/images/readme/comments.webp" alt="LinkLine 歌曲评论页面" width="500"></a>
+      <br><strong>歌曲评论</strong><br><sub>看看同一首歌，留下了哪些共鸣</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
       <a href="docs/images/readme/local-library.webp"><img src="docs/images/readme/local-library.webp" alt="LinkLine 本地音乐分类与导入页面" width="500"></a>
       <br><strong>本地音乐</strong><br><sub>歌曲、歌手、专辑、文件夹，四种整理方式</sub>
     </td>
+  </tr>
+  <tr>
     <td width="50%" align="center">
-      <a href="docs/images/readme/appearance.webp"><img src="docs/images/readme/appearance.webp" alt="LinkLine 外观定制面板" width="500"></a>
-      <br><strong>你的外观</strong><br><sub>配色、圆角、间距与图片主题，自由调整</sub>
+      <a href="docs/images/readme/lyrics-island.webp"><img src="docs/images/readme/lyrics-island.webp" alt="LinkLine 灵动岛歌词，显示专辑封面与逐字高亮歌词" width="500"></a>
+      <br><strong>灵动岛歌词</strong><br><sub>小巧悬浮，让歌词陪着你</sub>
+    </td>
+    <td width="50%" align="center">
+      <a href="docs/images/readme/lyrics-taskbar.webp"><img src="docs/images/readme/lyrics-taskbar.webp" alt="LinkLine 任务栏歌词，显示专辑封面、原文与翻译" width="500"></a>
+      <br><strong>任务栏歌词</strong><br><sub>原文与翻译，融入 Windows 任务栏</sub>
     </td>
   </tr>
 </table>
