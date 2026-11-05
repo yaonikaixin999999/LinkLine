@@ -135,6 +135,9 @@ async function main() {
       resolvePlatformStream: async(...args) => { resolveArgs = args; return response },
       acceptStream: (_track, stream) => { accepted = stream },
     },
+    // Media-duration validation has its own suite; this contract isolates the
+    // platform-provided rights, quality fallback and preview metadata.
+    '@renderer/ui/services/streamValidation': { readStreamDuration: async() => 180, isTruncatedStream: () => false },
     '@renderer/utils/ipc': {}, './utils': {},
   })
   assert.match(await online.getMusicUrl({ musicInfo: track, isRefresh: false }), /RS02/)
@@ -146,7 +149,7 @@ async function main() {
   assert.deepEqual(resolveArgs, [track, true, true, 'auto', { rejectedUrls }], 'media failures reach the single main-process source chain')
   const qs = { ...track, source: 'qs' }
   await online.getMusicUrl({ musicInfo: qs, isRefresh: false, allowToggleSource: false })
-  assert.deepEqual(resolveArgs, [qs, false, false, 'auto', { rejectedUrls: undefined }])
+  assert.deepEqual(resolveArgs, [qs, false, false, 'auto', { rejectedUrls: [] }])
   console.log('Official preview contracts passed (Netease/QQ rights, quality fallback, full-stream priority, trial state).')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

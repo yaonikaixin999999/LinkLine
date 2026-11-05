@@ -17,8 +17,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/LinkLine-v1.2.1-x64-Setup.exe"><strong>下载 Windows 版</strong></a> ·
-  <a href="https://gh-proxy.com/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/LinkLine-v1.2.1-x64-Setup.exe">国内加速下载</a> ·
+  <a href="https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/LinkLine-v1.2.2-x64-Setup.exe"><strong>下载 Windows 版</strong></a> ·
+  <a href="https://gh-proxy.com/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/LinkLine-v1.2.2-x64-Setup.exe">国内加速下载</a> ·
   <a href="docs/项目说明.md">使用手册</a> ·
   <a href="https://github.com/yaonikaixin999999/LinkLine/issues">反馈问题</a>
 </p>
@@ -26,7 +26,7 @@
 LinkLine 是一款基于 LXMusic 开源项目再开发的桌面音乐应用。连接平台账号，汇总喜欢的歌曲与自建歌单；导入本地音乐，按歌手、专辑和文件夹整理。用随主题变化的沉浸播放器、滚动歌词与独立外部歌词，听见分散在不同地方的音乐。
 
 <p align="center">
-  <a href="docs/images/readme/home-light.webp"><img src="docs/images/readme/home-light.webp" width="1000" alt="LinkLine 1.1.0 浅色主题推荐页，绿色点缀、浮动面板与底部播放器"></a>
+  <a href="docs/images/readme/home-light.webp"><img src="docs/images/readme/home-light.webp" width="1000" alt="LinkLine 1.2.2 浅色主题推荐页，绿色点缀、浮动面板与底部播放器"></a>
   <br>
   <sub>浅色主题 · 推荐页 · 无描边浮动面板</sub>
 </p>
@@ -56,7 +56,7 @@ LinkLine 是一款基于 LXMusic 开源项目再开发的桌面音乐应用。�
   </tr>
 </table>
 
-*截图来自 LinkLine 1.1.0；点击图片可查看大图。*
+*截图来自 LinkLine 1.2.2；点击图片可查看大图。*
 
 ## 为听歌而设计
 
@@ -79,13 +79,13 @@ LinkLine 是一款基于 LXMusic 开源项目再开发的桌面音乐应用。�
 
 ## 下载与安装
 
-当前版本 **1.2.1**，支持 **Windows 10 / 11，64 位（x64）**。
+当前版本 **1.2.2**，支持 **Windows 10 / 11，64 位（x64）**。
 
 | 下载入口 | 链接 |
 | --- | --- |
-| GitHub 官方 | [下载 LinkLine-v1.2.1-x64-Setup.exe](https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/LinkLine-v1.2.1-x64-Setup.exe) |
-| 国内加速 | [gh-proxy.com](https://gh-proxy.com/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/LinkLine-v1.2.1-x64-Setup.exe) · [备用 ghfast.top](https://ghfast.top/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/LinkLine-v1.2.1-x64-Setup.exe) |
-| 版本与校验 | [所有正式版本](https://github.com/yaonikaixin999999/LinkLine/releases) · [SHA-256 校验文件](https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.1/SHA256SUMS.txt) |
+| GitHub 官方 | [下载 LinkLine-v1.2.2-x64-Setup.exe](https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/LinkLine-v1.2.2-x64-Setup.exe) |
+| 国内加速 | [gh-proxy.com](https://gh-proxy.com/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/LinkLine-v1.2.2-x64-Setup.exe) · [备用 ghfast.top](https://ghfast.top/https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/LinkLine-v1.2.2-x64-Setup.exe) |
+| 版本与校验 | [所有正式版本](https://github.com/yaonikaixin999999/LinkLine/releases) · [SHA-256 校验文件](https://github.com/yaonikaixin999999/LinkLine/releases/download/v1.2.2/SHA256SUMS.txt) |
 
 下载后运行安装程序，按提示完成安装。国内入口由第三方服务转发官方文件，连接失败时可切换官方或备用入口。已有用户可在应用内的「检查更新」下载安装包，升级前可导出备份。
 
@@ -110,26 +110,24 @@ QQ 音乐使用手机 QQ 扫描应用内二维码，网易云音乐使用网易�
 | 酷狗音乐 | 支持，可验证账号 | 暂不支持 | 暂不支持 | 暂不支持 |
 | 酷我音乐 | 官网入口，暂不能验证账号 | 暂不支持 | 暂不支持 | 暂不支持 |
 
-酷狗与酷我目前提供公开播放能力和官方登录入口，尚不支持云收藏同步。哔哩哔哩按视频 / 音轨和收藏夹处理。平台接口可能变化；登录或同步成功不代表获得所有歌曲的播放权限。
+酷狗与酷我目前提供公开播放能力和官方登录入口，尚不支持云收藏同步。哔哩哔哩按视频 / 音轨和收藏夹处理，支持仅从 LinkLine 移除已同步收藏夹或视频，重新同步也不会自动补回；该操作不修改 B 站收藏。平台接口可能变化；登录或同步成功不代表获得所有歌曲的播放权限。
 
 汽水音乐为实验性适配：在「平台账号与红心」使用汽水音乐 App 的「扫一扫」，手机确认后若平台要求验证码或身份验证，会显示独立的官方安全验证窗口；完成后继续登录并同步红心及歌单。查询临时受限时会等待自动重试，验证窗口出现时间取决于平台响应。搜索页可选择汽水音乐，歌单导入支持分享链接或 ID；未登录或完整搜索受限时，只展示搜索联想实际返回的有限结果。音频与歌词来自官方分享及歌曲接口，支持刷新音频信息、原声片段和主备播放地址；网页权限可能与 App 不同，受保护、仅试听或版权受限的资源不作完整播放。暂不提供原生无损、Hi-Res 等音质切换，真实账号同步及收藏写入仍需结合实际账号验证。
 
 波点音乐为实验性适配：在设置中使用波点音乐 App 扫码，确认后同步红心、自建及收藏歌单；支持歌曲、歌单、专辑、歌手搜索、歌单链接导入、歌词和官方音频。按平台实际返回的格式展示音质，会员试听会标记「试听」并优先尝试其他平台的完整歌曲。公开接口及二维码已验证，真实账号授权后的同步和收藏写入仍需本人测试。账号设置顺序为 QQ 音乐、网易云音乐、汽水音乐、波点音乐，再到其他平台。
 
-## 1.2.1 有什么新变化
+## 1.2.2 有什么新变化
 
-- 换用「拍点」Logo 与几何 LinkLine 字标，左上角品牌缩小并靠左排列，同步应用、安装包及托盘图标。
-- 改进任务栏歌词在任务栏重建、宿主异常后的自动恢复；翻译显示独立于双行开关，修复部分缩放比例下外部歌词窗口尺寸变化。
-- QQ 音乐、网易云音乐使用应用内二维码登录；汽水音乐改用汽水 App 扫码，按平台要求显示官方验证码 / 身份验证窗口。
-- 改进汽水分享音频刷新、原声片段与官方播放器主备地址处理，探测连接并尝试其他有效候选；网页权限、版权及受保护内容的限制仍然适用。
-- 补全网易云增强音质查询与实际规格展示；Audio Vivid 因当前播放器不支持 AV3A 解码而禁选。
-- 播放器调整歌词、队列及更多入口，增加「减少推荐」，将歌曲加入本机不喜欢库并从后续推荐和续播中排除。
-- 在线音频加载失败时排除失效地址并重新解析 / 换源，改进导入音源的播放下载适配及默认脚本缓存。
-- 更新中心支持排版显示发行说明；调整歌单详情留白、批量操作区域和侧栏封面占位。
+- 默认不附带或自动导入音源脚本；升级时清理旧版预置项及缓存，保留手动导入的脚本，并修复恢复旧备份后的失效音源选择。
+- B 站收藏夹和视频新增「从 LinkLine 移除」，只影响本机音乐库；同一账号重新同步或登录时不会自动补回，不删除远端收藏夹或取消视频收藏。
+- 播放前检查实际音频时长，识别未标注的试听片段并继续尝试完整资源；没有完整资源时明确标为试听。
+- 提前准备下一首，处理预加载过期、切歌和音源 / 音质变更，减少复用失效音频。
+- 调整歌手搜索结果与平台切换，改进波点歌手、专辑作品分页；切换页面时清理顶部残留搜索文字。
+- 启动时清理临时文件及网页资源、代码缓存，保留账号、音乐库和设置；同步更新 README 界面截图。
 
 升级会保留已保存的外观和歌词偏好。播放器的封面、背景和沉浸设置位于「更多播放器功能 → 播放器外观」，歌词字号与间距位于歌词区域的设置菜单。
 
-[完整发行说明](docs/releases/v1.2.1.md) · [更新日志](CHANGELOG.md) · [外部歌词说明](docs/external-lyrics.md) · [性能优化说明](docs/性能优化说明.md)
+[完整发行说明](docs/releases/v1.2.2.md) · [更新日志](CHANGELOG.md) · [外部歌词说明](docs/external-lyrics.md) · [性能优化说明](docs/性能优化说明.md)
 
 ## 开发与资料
 

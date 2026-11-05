@@ -1,6 +1,6 @@
 {
   "name": "linkline",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "LinkLine — 多平台音乐桌面客户端，基于 LXMusic 开源项目再开发",
   "main": "./dist/main.js",
   "scripts": {
